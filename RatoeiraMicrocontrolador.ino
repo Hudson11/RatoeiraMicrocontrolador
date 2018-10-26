@@ -1,13 +1,12 @@
-/*
-  DECLARANDO AS CONSTANTES DOS PINOS DE SAIDAS DIGITAIS E ENTRADAS ANALÓGICAS
-*/
-
 #define buzzer  6
 #define motor  5
 #define pot  A0
 #define ldr  A1
 #define led  4
 #define rele 3
+#define rele_cooler 2
+#define led_init 8
+#define bottom 9
 
 int valuePot = 0;
 int valueLdr = 0;
@@ -28,15 +27,25 @@ void setup()
   pinMode(ldr, INPUT);
   pinMode(pot, INPUT);
   pinMode(rele, OUTPUT);
+  pinMode(rele_cooler, OUTPUT);
+  pinMode(led_init, OUTPUT);
+  pinMode(bottom, INPUT);
   
   Serial.begin(9600);
   Serial.println("Teste Projeto Ratoeira");
+  
+  
+  while(digitalRead(bottom) == LOW){
+    Serial.println("SISTEMA OCIOSO");
+  }
+  
 }
 
 void loop()
 {
 
   digitalWrite(led, HIGH);
+  digitalWrite(led_init, HIGH);
   /*
     MAPEAMENTO DA LEITURA ANALÓGICA DO LDR E POTENCIOMETRO
   */
@@ -55,11 +64,12 @@ void loop()
   */
   if(test == 0){
     if(valueLdr > valuePot){
-      analogWrite(rele, HIGH);
-      delay(400);
+      digitalWrite(rele, HIGH);
+      digitalWrite(rele_cooler, HIGH);
+      delay(3000);
       digitalWrite(rele, LOW);
       tone(buzzer, 440);
-      delay(3000);
+      delay(15000);
       /*
           TEST INICIALMENTE 0, SERÁ ATIVADA APÓS O RATO ENTRAR NA RATOEIRA E SEJA CAPTURADO,
         BASICAMENTE NOS IMPEDIMOS QUE ELE ENCOSTE NOVAMENTE NO LDR, ASSIM, ACIONANDO NOVAMENTE
@@ -69,6 +79,7 @@ void loop()
     }
   }else{
     digitalWrite(rele, LOW);
+    digitalWrite(rele_cooler, LOW);
     noTone(buzzer);
   }
   
